@@ -1,0 +1,7 @@
+# Selectores CSS a ocultar (uno por línea). Se aplican con display:none.
+
+# Barra de usuario / login (pie del sidebar)
+[data-slot="sidebar-footer"]
+
+# Botón de notificaciones
+button[aria-label*="Notifications"]

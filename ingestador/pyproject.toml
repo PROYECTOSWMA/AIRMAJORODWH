@@ -1,0 +1,30 @@
+[project]
+name = "gmail-pipeline"
+version = "0.1.0"
+requires-python = ">=3.10"
+dependencies = [
+  "dagster>=1.8.0",
+  "dagster-webserver>=1.8.0",
+  "google-api-python-client>=2.100.0",
+  "google-auth>=2.23.0",
+  "pandas>=2.0.0",
+  "peewee>=3.17.0",
+  "pdfplumber>=0.11.0",
+  "openpyxl>=3.1.0",
+  "psycopg[binary]>=3.1",
+  "dagster-dbt>=0.29.12",
+  "dbt-core>=1.9.1,<1.10",
+  "dbt-sqlite>=1.9.1,<1.10",
+  "duckdb>=1.5,<1.6",
+  "dbt-duckdb>=1.9.6,<1.10",
+  # Navegador headless: plan B  
+  # # "selenium>=4.25",
+]
+
+[tool.dagster]
+module_name = "definitions"
+
+[tool.pyright]
+venvPath = "."
+venv = ".venv"
+reportIncompatibleVariableOverride = "none"

@@ -1,0 +1,65 @@
+# Build
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+artifacts/
+publish/
+dist/
+
+# Visual Studio / Rider / VS Code / Cursor
+.vs/
+.idea/
+.cursor/
+*.user
+*.userosscache
+*.suo
+*.userprefs
+*.rsuser
+*.sln.docstates
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json.example
+
+# NuGet
+*.nupkg
+*.snupkg
+**/[Pp]ackages/*
+!**/[Pp]ackages/build/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# Publish / single-file leftovers
+*.exe
+*.dll
+*.pdb
+*.deps.json
+*.runtimeconfig.json
+*.staticwebassets.endpoints.json
+web.config
+appsettings.Development.json
+
+# Keep source config template tracked; ignore local secrets overrides
+**/appsettings.*.local.json
+**/secrets.json
+
+# OS
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# Test / coverage
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+*.coverage
+*.coveragexml
+coverage*/
+
+# Others
+*.log
+*.tmp
+*.temp
+*.cache
+*.bak

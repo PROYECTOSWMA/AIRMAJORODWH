@@ -1,0 +1,88 @@
+SqlGateway — Puente HTTP hacia SQL Server
+==========================================
+
+Qué hace
+--------
+Escucha en un puerto HTTP configurable. Recibe SQL por POST y devuelve
+una tabla en JSON o un error. SQL Server no necesita exponer su puerto
+hacia fuera: solo este programa habla con la BD.
+
+
+Uso con interfaz gráfica
+------------------------
+1. Ejecutar SqlGateway.exe
+2. Se abre una ventana para ingresar:
+     - Servidor SQL (host/IP)
+     - Puerto SQL Server (ej. 1433)
+     - Base de datos
+     - Usuario y contraseña
+     - Puerto de escucha del gateway (ej. 5055)
+     - ApiKey opcional
+3. Pulsar "Guardar y cerrar"
+4. La ventana se cierra y el programa SIGUE CORRIENDO en segundo plano
+   (icono en la bandeja del sistema, junto al reloj).
+
+Desde el icono de la bandeja (clic derecho):
+  - Configuración…     volver a editar y guardar
+  - Abrir /health      comprobar que responde
+  - Salir              detener el programa por completo
+
+Doble clic en el icono también abre la configuración.
+
+
+Entrega / instalación
+---------------------
+Copiar al servidor:
+  SqlGateway.exe
+  appsettings.json
+  LEEME.txt
+
+Abrir en el firewall SOLO el puerto de escucha del gateway (no el 1433).
+
+
+API
+---
+GET  http://SERVIDOR:PUERTO/health
+
+POST http://SERVIDOR:PUERTO/query
+Headers:
+  Content-Type: application/json
+  X-Api-Key: (si configuró ApiKey)
+Body:
+  { "sql": "SELECT TOP 10 * FROM MiTabla" }
+
+Respuesta OK:
+  { "ok": true, "columns": [...], "rows": [...], "rowCount": N }
+
+Respuesta error:
+  { "ok": false, "error": "..." }
+
+
+Ejemplo PowerShell
+------------------
+$headers = @{ "Content-Type" = "application/json" }
+# Si hay ApiKey: $headers["X-Api-Key"] = "su-clave"
+$body = '{ "sql": "SELECT GETDATE() AS Ahora" }'
+Invoke-RestMethod -Uri "http://SERVIDOR:5055/query" -Method POST -Headers $headers -Body $body
+
+
+Servicio Windows (opcional, sin ventana)
+----------------------------------------
+sc create SqlGateway binPath= "C:\ruta\SqlGateway.exe" start= auto
+sc start SqlGateway
+
+
+Publicar de nuevo el .exe
+-------------------------
+En la carpeta SqlGateway:
+  .\publish.ps1
+
+Resultado en la carpeta dist\
+
+
+Notas
+-----
+- Si cambia el puerto de escucha después de iniciado, el programa se reinicia solo para aplicarlo.
+- Cambios de usuario/clave/servidor SQL se aplican al guardar, sin reiniciar.
+- Use una cuenta SQL con el mínimo de permisos necesarios.
+- Active "Solo lectura" si no necesita INSERT/UPDATE/DELETE.

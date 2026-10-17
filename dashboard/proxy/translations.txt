@@ -1,0 +1,23 @@
+# Traducciones — Formato:  <texto original> => <traducción>
+# Líneas con # se ignoran.
+# La entrada "Evidence" define también el prefijo del título de la pestaña.
+
+Evidence => Air Majoro Dashboard
+Open menu => Abrir menú
+Toggle Sidebar => Mostrar/ocultar menú
+Download PDF => Descargar PDF
+Download Image => Descargar imagen
+Fullscreen => Pantalla completa
+Organizations => Organizaciones
+Switch organization => Cambiar organización
+Not logged in => Sesión no iniciada
+No pages found => No hay páginas
+To log in, run => Para iniciar sesión, ejecuta
+
+# Etiquetas del selector de granularidad ({% date_grain_selector %})
+Day => Diario
+Week => Semanal
+Month => Mensual
+Quarter => Trimestral
+Year => Anual
+Hour => Por hora

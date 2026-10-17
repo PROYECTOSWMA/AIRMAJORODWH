@@ -1,0 +1,35 @@
+# Entorno virtual: NUNCA al repo (si no, un `git add -A` se lo lleva entero).
+.venv/
+venv/
+
+__pycache__/
+*.pyc
+.pytest_cache/
+.pytest
+
+# Dagster
+.dagster/
+dagsterhome/
+
+# DB (la capa de integración, ~21 GB: se reconstruye con los assets)
+*.db
+db.sqlite
+db.sqlite-journal
+
+# DuckDB (motor analítico: fichero del POC / migración)
+*.duckdb
+*.duckdb.wal
+
+# Credenciales: el CONTENIDO de env/ queda fuera (no la carpeta: si se excluye
+# `env/` entera, git no entra y el `!` del ejemplo no surte efecto).
+env/*
+!env/.env.example
+
+
+# dbt
+src/dbt/target/
+src/dbt/logs/
+
+*.tmp
+
+.aider*

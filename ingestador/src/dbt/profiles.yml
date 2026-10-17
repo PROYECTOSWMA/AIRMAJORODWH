@@ -1,0 +1,60 @@
+# Perfil del proyecto dbt `consolidado`: UN ÚNICO target, `dev`, que es el motor
+# analítico DuckDB. Lee `db.sqlite` (la base de ingesta de Dagster) con la
+# extensión `sqlite` y materializa en `analytics_poc.duckdb`.
+#
+# Es el target POR DEFECTO: `dbt run` a secas ya usa DuckDB. El antiguo target
+# SQLite (dbt-sqlite sobre `db.sqlite`) se eliminó: medido en este repo, el mismo
+# proyecto tarda ~5,2 s con DuckDB frente a ~89,9 s con SQLite
+# (`dwh_movimientos_sin_cuentas`: 0,54 s vs 84,4 s).
+#
+# La publicación al DWH es el asset `publish_dwh` (grupo `dwh`): lee ESTE DuckDB y copia
+# todas sus tablas BASE al schema `dwh` de PostgreSQL con el mismo nombre (mismo motor en
+# `DwhPublishResource`). Las tablas `dwh_*` de `db.sqlite` NO se actualizan: son la fuente
+# que LEE dbt, no un destino.
+#
+# Rutas relativas al CWD del proceso: dbt se ejecuta con cwd = este directorio
+# (src/dbt/), así que '../../db.sqlite' == <repo>/db.sqlite.
+consolidado:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ../../analytics_poc.duckdb
+      schema: main
+      # `threads` solo limita la concurrencia de MODELOS en dbt: el adaptador
+      # dbt-duckdb no lo traslada a DuckDB (DuckDB usa todos los cores de la
+      # máquina). Para acotar los hilos internos de DuckDB sería vía
+      # `settings: {threads: N}`.
+      threads: 1
+      # La extensión `sqlite` es lo que permite leer `db.sqlite` desde DuckDB.
+      # Se autodescarga la 1ª vez (necesita red una vez; luego queda cacheada).
+      extensions:
+        - sqlite
+      # `db.sqlite` se adjunta como catálogo `src`. Los modelos lo LEEN (nombres
+      # de tabla "pelados"); el destino de todo lo que se materializa es el
+      # DuckDB de `path`.
+      attach:
+        - path: ../../db.sqlite
+          type: sqlite
+          alias: src
+      # `ingested_at` se calcula en UTC (equivalente al datetime('now') de SQLite).
+      # `search_path` resuelve los nombres de tabla "pelados" que usan los modelos
+      # (`FROM planilla`, `JOIN from_email_corpac_headers`, ...): sin él, DuckDB
+      # solo ve el catálogo propio y habría que reescribir 17 referencias.
+      settings:
+        TimeZone: UTC
+        search_path: src.main
+        # ⚠️ WORKAROUND de un bug de DuckDB (1.5.5): cuando varios modelos
+        # `ephemeral` con la MISMA estructura se inlinean juntos en un `UNION ALL`
+        # (los 6 modelos de factura del exterior dentro de `invoice_std`), el
+        # optimizador `cte_inlining` **mezcla las ramas** y devuelve las filas de
+        # OTRA rama: comprobado el 2026-10-08, las 5 filas de Peniel salían como
+        # las 6 de JetSet (461.565,00 en vez de 459,30; total 160 en vez de 159).
+        # Desactivarlo hace que DuckDB materialice esas CTE y los datos salen
+        # bien; es el único cambio necesario y no afecta a ninguna otra consulta.
+        #
+        # `common_subplan` y `unused_columns` (2026-10-09) van por lo mismo: en
+        # `invoices_audit` (otro `UNION ALL` largo con ramas idénticas, una por
+        # proveedor) el optimizador volvía a mezclar y la rama de Peniel salía con los
+        # ficheros de JetSet. Los tres son la misma maquinaria de reescritura.
+        disabled_optimizers: cte_inlining,common_subplan,unused_columns

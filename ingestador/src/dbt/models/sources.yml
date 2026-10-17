@@ -1,0 +1,77 @@
+version: 2
+
+# Tablas de origen del consolidado de ventas (esquema principal de db.sqlite).
+sources:
+  - name: sire
+    schema: main
+    description: "Ventas SIRE (sire_sales y su detalle)."
+    tables:
+      - name: sire_sales
+      - name: sire_sales_details
+  - name: compras
+    schema: main
+    description: "Compras SIRE (sire_purchs y su detalle)."
+    tables:
+      - name: sire_purchs
+      - name: sire_purchs_details
+  - name: cost_centers
+    schema: main
+    description: "Aeronaves extraídas de los XML de compras SIRE por proveedor."
+    tables:
+      - name: from_sire_cep_cost_centers
+      - name: from_sire_icaro_cost_centers
+      - name: from_sire_petroperu_cost_centers
+  - name: sisa
+    schema: main
+    description: "Liquidación contable de ventas (sisa_sales)."
+    tables:
+      - name: sisa_sales
+  - name: ambulancia
+    schema: main
+    description: "Ventas de ambulancia aérea (hoja VUELOS B200 2026 del libro VENTAS)."
+    tables:
+      - name: ambulancia_ventas_reports
+  - name: selva
+    schema: main
+    description: >-
+      Reporte de ventas estático "1.- REPORTE DE VENTAS" (una hoja por mes y
+      empresa: Air Majoro Selva y Air Majoro S.A).
+    tables:
+      - name: sales_selva
+  - name: lap
+    schema: main
+    description: "Compras de LAP / LIMA AIRPORT PARTNERS (hoja Aeronave del Excel LAP)."
+    tables:
+      - name: lap_reports
+  - name: invoices_extranjero
+    schema: main
+    description: >-
+      Facturas de proveedores del exterior y órdenes de compra de
+      `static/INVOICE INTERNACIONALES/`. Cada proveedor tiene su parser y sus DOS
+      tablas (cabecera y detalles): Fenix, JetSet, Kal, Peniel, Precision
+      Heliparts (PAG) y Textron, más las órdenes de compra (`static_invoice_po_*`),
+      que comparten formato entre las seis subcarpetas. El cruce factura ↔ orden de
+      compra se hace en dbt (siguiente paso).
+    tables:
+      - name: static_invoice_fenix_header
+      - name: static_invoice_fenix_details
+      - name: static_invoice_jetset_header
+      - name: static_invoice_jetset_details
+      - name: static_invoice_kal_header
+      - name: static_invoice_kal_details
+      - name: static_invoice_peniel_header
+      - name: static_invoice_peniel_details
+      - name: static_invoice_precision_header
+      - name: static_invoice_precision_details
+      - name: static_invoice_textron_header
+      - name: static_invoice_textron_details
+      - name: static_invoice_po_header
+      - name: static_invoice_po_details
+  - name: from_sql_majoro
+    schema: main
+    description: >-
+      Reportes que salen de consultas SQL directas contra SISA. Hoy solo el
+      reporte de estadísticas de vuelos (`flight_reports`); no tiene relación
+      con ninguna otra tabla del proyecto.
+    tables:
+      - name: flight_reports

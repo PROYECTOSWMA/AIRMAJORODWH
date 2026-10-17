@@ -1,0 +1,36 @@
+info:
+  name: Argumentos Función
+  type: http
+  seq: 2
+
+http:
+  method: POST
+  url: http://38.187.7.111:5500/query
+  headers:
+    - name: Content-Type
+      value: application/json
+  body:
+    type: json
+    data: |-
+      // On script
+      {}{
+        "sql": "select 1"
+      }
+  auth: inherit
+
+runtime:
+  scripts:
+    - type: before-request
+      code: |-
+        // req.setBody({"sql": `
+        // select 1
+
+
+        // `});
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

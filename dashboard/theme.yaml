@@ -1,0 +1,7 @@
+site_name: "Air Majoro"
+
+# Nota: la tipografía del informe (Poppins) NO se define aquí.
+# El token `fonts` de Evidence solo admite sans-serif | serif | mono
+# (fuentes empaquetadas), así que una fuente propia no puede declararse.
+# Poppins se carga y aplica desde proxy/proxy.mjs (ver proxy/README.md).
+

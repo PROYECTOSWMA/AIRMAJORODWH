@@ -1,0 +1,10 @@
+# Local dev cache / generated artifacts (safe to delete)
+.evidence/
+
+# Warehouse credentials — never commit
+connection.yaml
+.env
+.env.*
+
+# npm (only used for the convenience scripts in package.json)
+node_modules/

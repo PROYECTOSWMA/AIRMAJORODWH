@@ -1,0 +1,22 @@
+info:
+  name: Accesos
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://38.187.7.111:5500/query
+  body:
+    type: json
+    data: |-
+      {
+        "sql": "SELECT name AS NombreFuncion, type_desc AS TipoFuncion, create_date AS FechaCreacion, modify_date AS FechaModificacion FROM sys.objects"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

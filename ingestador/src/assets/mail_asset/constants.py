@@ -1,0 +1,2 @@
+
+_MAX_RESULTS = 500

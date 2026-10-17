@@ -1,0 +1,22 @@
+info:
+  name: Untitled 1
+  type: http
+  seq: 4
+
+http:
+  method: POST
+  url: http://38.187.7.111:5500/query
+  body:
+    type: json
+    data: |-
+      {
+        "sql": "EXECUTE [dbo].[USP_UVW_LIQUIDACION_CONTA] @CODORGDOREF='01', @CODEMPDOREF='02', @CODSEDDOREF='06', @RAZONSOCIAL=NULL, @CODNVEDOREF=NULL, @T01TIPOPAGO=NULL, @NUMERODERUC=NULL, @FECHAINICIO='01/05/2026', @FECHATERMIN='31/05/2026'"
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+  forwardAuthorizationHeader: false

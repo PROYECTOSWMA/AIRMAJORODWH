@@ -1,0 +1,74 @@
+# Proyecto dbt del consolidado contable.
+# Target único `dev` (DuckDB): lee `db.sqlite` con la extensión `sqlite` y
+# materializa en `analytics_poc.duckdb` (ver src/dbt/profiles.yml).
+
+name: consolidado
+version: 1.0.0
+
+profile: consolidado
+
+# Variables de proyecto: disponibles en todo el proyecto con {{ var('nombre') }}.
+# RUC de proveedores, para poder referenciarlos individualmente por nombre.
+# Los que entran por sus VÍAS PROPIAS (CORPAC, ADP y LAP) se EXCLUYEN del
+# genérico `compras_sire`; el resto (CEP, ÍCARO, PETROPERÚ y TERPEL) entra por
+# ahí, con su cost_center resuelto en `cost_centers`.
+vars:
+  ruc_cep: '20613566881'        # CEP
+  ruc_icaro: '20602542115'      # ICARO
+  ruc_petroperu: '20100128218'  # PETROPERU
+  ruc_terpel: '20259880603'     # TERPEL
+  ruc_corpac: '20100004675'     # CORPAC
+  ruc_adp: '20514513172'        # ADP / AEROPUERTOS DEL PERU
+  ruc_lap: '20501577252'        # LAP / LIMA AIRPORT PARTNERS
+
+model-paths: ["models"]
+# Los CSV de referencia (maestros `dwh_static_*` y auxiliares `static_aux_*`)
+# viven fuera del proyecto dbt, al PRIMER NIVEL de la carpeta ÚNICA de estáticos
+# del repo `static/` (las antiguas `static/static_assets` y `static/dbt_seeds` se
+# eliminaron: los CSV conviven con los operativos VENTAS*.xlsm / LAP*.xlsx /
+# Planilla.ods y con la carpeta RH/).
+# Ruta relativa desde src/dbt/ => <repo>/static.
+# OJO: NINGUNO es un seed de dbt (todos están `+enabled: false` en el bloque
+# `seeds:`) **ni los lee dbt**: los ingiere el asset Dagster `static_data_asset` en
+# las tablas homónimas de `db.sqlite`, y los modelos de `models/static/` leen ESAS
+# tablas (nombre pelado resuelto por `search_path: src.main`). `dbt seed` no hace
+# falta para nada.
+seed-paths: ["../../static"]
+test-paths: ["tests"]
+analysis-paths: ["analyses"]
+macro-paths: ["macros"]
+snapshot-paths: ["snapshots"]
+
+clean-targets:
+  - target
+  - dbt_packages
+
+models:
+  consolidado:
+    +materialized: table
+
+# NINGÚN CSV de `static/` es ya un seed de dbt: los **6** los ingiere
+# el asset `static_data_asset` en la tabla homónima de `db.sqlite`, y el modelo que
+# copia esa tabla a DuckDB con `dbt run` está en `models/static/` (los maestros se
+# llaman `static_*` y los auxiliares `aux_*`; el `FROM` de esos modelos usa el nombre
+# "pelado" de la tabla de `db.sqlite`, que sí conserva su prefijo). Se deshabilitan
+# aquí para que ningún `dbt seed` escriba una tabla del DWH por error.
+# Si añades un CSV nuevo: crea su modelo en `models/static/`, su modelo peewee + su
+# entrada en `CSV_SPECS` (asset) y deshabilítalo aquí también.
+seeds:
+  consolidado:
+    # Maestros que se publican al DWH (`dwh_static_*`).
+    dwh_static_master_accounts:
+      +enabled: false
+    dwh_static_airplanes:
+      +enabled: false
+    dwh_static_cost_centers:
+      +enabled: false
+    # Auxiliares/overrides (`static_aux_*`).
+    static_aux_accounts_assignment:
+      +enabled: false
+    static_aux_airports:
+      +enabled: false
+    static_aux_cost_centers_override:
+      +enabled: false
+
